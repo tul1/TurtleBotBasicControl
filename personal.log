@@ -1,0 +1,23 @@
+Set of commnand to build the developement enviroment
+
+mkdir catkin_ws
+mkdir src
+cd src
+catkin_init_workspace
+cd ..
+catkin_make
+source devel/setup.bash
+cd src
+catkin_create_pkg turtlebot_driver roscpp nav_msgs geometry_msgs
+cd ..
+catkin_make -> everytime I want to rebuild the node.
+
+
+
+Usefull commands
+
+rostopic list
+rostopic info nav_msgs
+rosmsg show odom
+roslaunch turtlebot_gazebo turtlebot_world.launch
+rosrun turtlebot_driver turtlebot_driver_node
