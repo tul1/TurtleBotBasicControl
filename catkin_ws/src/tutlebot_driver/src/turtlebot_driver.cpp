@@ -1,12 +1,10 @@
 #include <iostream>
 #include <cmath>
-
+#include <tf/transform_datatypes.h>
 
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
-
-#include <tf/transform_datatypes.h>
 
 
 class RobotDriver {
@@ -48,15 +46,15 @@ class RobotDriver {
 		void moveForward(double distance, double speed) {
 			geometry_msgs::Twist base_cmd;
 			ros::spinOnce();
-			double start_position_x = position_x_;
-			double start_position_y = position_y_;
+			double start_position_x = position_[0];
+			double start_position_y = position_[1];
 			
-			while( calculateDistance(start_position_x, start_position_y, position_x_,position_y_) < distance ){
+			while( calculateDistance(start_position_x, start_position_y, position_[0],position_[1]) < distance ){
 				base_cmd.linear.x = speed;
 				cmd_vel_pub_.publish(base_cmd);
 
-				std::cout<< "x: " << position_x_ << "y: " << position_y_ <<"\n";
-				std::cout<< "calculated distance: " << calculateDistance(start_position_x, start_position_y, position_x_,position_y_) <<"\n";
+				std::cout<< "x: " << position_[0] << "y: " << position_[1] <<"\n";
+				std::cout<< "calculated distance: " << calculateDistance(start_position_x, start_position_y, position_[0],position_[1]) <<"\n";
 
 				ros::spinOnce();
 			}
@@ -75,7 +73,7 @@ class RobotDriver {
 
 		void turnRight(double angle, double speed){			
 			geometry_msgs::Twist base_cmd;
-			float destination_yaw_angle = computeDestinationAngle(yaw_angle_,angle);
+			float destination_yaw_angle = calculateDestinationAngle(yaw_angle_,angle);
 
 			ros::spinOnce();
 			while( std::abs(yaw_angle_) < angle){
@@ -100,7 +98,7 @@ class RobotDriver {
 			double polygon_internal_angle = (edges-2)*180/edges;
 			int i;	
 			for(i=0; i<edges; i++){
-				moveForward(edge_size, linear_speed);
+				moveForward(edges_size, linear_speed);
 				turnRight(polygon_internal_angle, angular_speed);
 			}
 		}
@@ -118,7 +116,7 @@ int main(int argc, char** argv){
 	double angular_speed = 0.3;
 	double linear_speed = 0.2;
 
-	while(nh_.ok())
+	while(nh.ok())
 		driver.driveOnAPolygonPath(4, 2, linear_speed, angular_speed);
 
 }
