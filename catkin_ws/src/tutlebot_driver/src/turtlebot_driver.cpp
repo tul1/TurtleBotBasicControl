@@ -6,6 +6,8 @@
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
 
+#define DEBUG_MOVE_FORWARD
+//#define DEBUG_TURN_RIGHT
 
 class RobotDriver {
 	private:
@@ -48,18 +50,28 @@ class RobotDriver {
 			ros::spinOnce();
 			double start_position_x = position_[0];
 			double start_position_y = position_[1];
-			
+
+#ifdef DEBUG_MOVE_FORWARD
+			int i=0;
+			std::cout << "initial_x: " << position_[0] << "  initial_y: " << position_[1] << std::endl;
+#endif
 			while( calculateDistance(start_position_x, start_position_y, position_[0],position_[1]) < distance ){
 				base_cmd.linear.x = speed;
 				cmd_vel_pub_.publish(base_cmd);
 
-				std::cout<< "x: " << position_[0] << "y: " << position_[1] <<"\n";
-				std::cout<< "calculated distance: " << calculateDistance(start_position_x, start_position_y, position_[0],position_[1]) <<"\n";
+#ifdef DEBUG_MOVE_FORWARD
+				if(i==10){
+					std::cout << "actual_x: " << position_[0] << "  actual_y: " << position_[1] << std::endl;
+					std::cout << "calculated_distance: " << calculateDistance(start_position_x, start_position_y, position_[0],position_[1]) << "  distance: " << distance << std::endl;
+					i=0;				
+				}
+				i++;
+#endif
 
 				ros::spinOnce();
 			}
 	
-			base_cmd.linear.x = 0;
+			base_cmd.linear.x = 0.0;
 			cmd_vel_pub_.publish(base_cmd);
 		}
 
@@ -78,9 +90,11 @@ class RobotDriver {
 			ros::spinOnce();
 			while( std::abs(yaw_angle_) < angle){
 
-				std::cout << "destination: "<< destination_yaw_angle << "  Start angle: " << yaw_angle_ <<"\n"; 
+#ifdef DEBUG_TURN_RIGHT
+				std::cout << "destination_angle: "<< destination_yaw_angle << "  actual_angle: " << yaw_angle_ << std::endl; 
+#endif
 
-				base_cmd.angular.z = - std::abs(speed);
+				base_cmd.angular.z = std::abs(speed);
 				cmd_vel_pub_.publish(base_cmd);
 				ros::spinOnce();
 			}
@@ -92,7 +106,7 @@ class RobotDriver {
 
 		void driveOnAPolygonPath(int edges, double edges_size, double linear_speed, double angular_speed) {
 			if(edges<3){
-				std::cout<<"A polygone have at least 3 edges. Please enter the correct number of edges.\n";
+				std::cout<<"A polygone have at least 3 edges. Please enter the correct number of edges."<<std::endl;
 				return;
 			}
 			double polygon_internal_angle = (edges-2)*180/edges;
@@ -117,7 +131,7 @@ int main(int argc, char** argv){
 	double linear_speed = 0.2;
 
 	while(nh.ok())
-		driver.driveOnAPolygonPath(4, 2, linear_speed, angular_speed);
+		driver.driveOnAPolygonPath(4, 1, linear_speed, angular_speed);
 
 }
 
