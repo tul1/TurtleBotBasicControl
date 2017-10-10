@@ -132,6 +132,15 @@ int main(int argc, char** argv){
 	double angular_speed = 0.3;
 	double linear_speed = 0.1;
 
+   std::cout << "Welcome to tutlebot_driver" << std::endl;
+   std::cout << "     _________     __  " << std::endl;
+   std::cout << "    /_|__|__|_\\   / -\\ " << std::endl;
+   std::cout << "   /__|__|__|__\\  \\__< " << std::endl;
+   std::cout << "o_/___|__|__|___\\_|    " << std::endl;
+   std::cout << "   ())      ())        " << std::endl;
+   std::cout << "" << std::endl;
+
+
 	while(nh.ok())
 		driver.driveOnAPolygonPath(4, 1, linear_speed, angular_speed);
 	
