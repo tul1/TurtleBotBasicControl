@@ -8,6 +8,10 @@
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
 
+
+#define MAX_LINEAR_SPEED 0.3
+#define MAX_ANGULAR_SPEED 0.4
+#define MATH_PI 3.141593
 //#define DEBUG_MOVE_FORWARD
 //#define DEBUG_TURN_RIGHT
 
@@ -36,7 +40,7 @@ class RobotDriver {
 		void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
 			tf::Pose pose;
 			tf::poseMsgToTF(msg->pose.pose, pose);
-			yaw_angle_ = tf::getYaw(pose.getRotation()) * 180 / 3.141593;
+			yaw_angle_ = tf::getYaw(pose.getRotation()) * 180 / MATH_PI;
 			position_[0] = msg->pose.pose.position.x;
 			position_[1] = msg->pose.pose.position.y;
 		}
@@ -121,7 +125,7 @@ class RobotDriver {
 				std::cout<<"A polygone have at least 3 edges. Please enter the correct number of edges."<<std::endl;
 				return;
 			}
-			double polygon_internal_angle = (edges-2)*180/edges;
+			double polygon_internal_angle = 180 - (edges-2)*180/edges;
 			for(int i=0; i<edges; i++){
 				moveForward(edges_size);
 				turnRight(polygon_internal_angle);
@@ -135,79 +139,101 @@ class RobotDriver {
 
 };
 
-
-int captureSpeedValue(std::string speed_tag){
+int captureIntValue(std::string value_tag, int min_value, int max_value){
 	int number = 0;
 	std::string str;
 	while(true){
-		std::cout << "Enter a number between 0 and 100 to set the "<< speed_tag <<" speed of the TurtleBot: " << std::endl;
+		std::cout << "Enter a number between " << min_value << " and " << max_value << " to set the "<< value_tag <<" of the TurtleBot\'s pathway: " << std::endl;
 		std::getline(std::cin,str);
 		std::stringstream ss(str);
 		if(ss >> number){
-			if(number<100)
+			if(number<=max_value && number>=min_value)
 				return number;
 		}
-		std::cout << "Enter a valid number between 0 and 100!" << std::endl;
+		std::cout << "Enter a valid number between " << min_value << " and " << max_value << "!" << std::endl;
 	}
 }
 
-int captureTurtleSpeed(double &linear, double &angular){
+double captureFloatValue(std::string value_tag, double min_value, double max_value){
+	double number = 0;
+	std::string str;
+	while(true){
+		std::cout << "Enter a number between " << min_value << " and " << max_value << " to set the "<< value_tag <<" of the TurtleBot\'s pathway: " << std::endl;
+		std::getline(std::cin,str);
+		std::stringstream ss(str);
+		if(ss >> number){
+			if(number<=max_value && number>=min_value)
+				return number;
+		}
+		std::cout << "Enter a valid number between " << min_value << " and " << max_value << "!" << std::endl;
+	}
+}
+
+
+int captureTurtleSettings(double &linear, double &angular,int &edges_number, double &edges_length){
 	char cmd[50];
 	while(true){
-		linear = captureSpeedValue("Linear")*0.3/100;
-		angular = captureSpeedValue("Angular")*0.4/100;
-
-		std::cout << "TurtleBot is ready to move this fast:" << std::endl;
+		linear = captureIntValue("Linear speed",0,100);
+		angular = captureIntValue("Angular speed",0,100);
+		edges_number = captureIntValue("Number of edges of the polygon",3,10);
+		edges_length = captureFloatValue("Length of edges of the polygon", 0.1, 5.0);
+		
+		std::cout << "TurtleBot is ready to go!" << std::endl;
+		std::cout << "" << std::endl;
 		std::cout << "Linear speed: " << linear << std::endl;
 		std::cout << "Angular speed: " << angular << std::endl;
-		
-		std::cout << "Do you agree? Y/N" << angular << std::endl;
+		std::cout << "Polygon's number of edges: " << edges_number << std::endl;
+		std::cout << "Polygon's edges' length: " << edges_length << std::endl;
+		std::cout << "" << std::endl;
+		std::cout << "Are this setting correct? Can we unleash the turtlebotsaurus? Y/N" << std::endl;
 		std::cin.getline(cmd,50);
 		if(cmd[0]!='Y' && cmd[0]!='N'){
 			std::cout << "Unknown command: " << cmd[0] << std::endl;
 			std::cout << "Only keys Y or N are valid commands." << std::endl;
+			std::cout << "" << std::endl;
 		}
-		if(cmd[0]!='Y')
+		if(cmd[0]!='Y'){
+			linear = linear*MAX_LINEAR_SPEED/100;
+			angular = angular*MAX_ANGULAR_SPEED/100;		
+			std::cout << "Let's roll!" << std::endl;
 			break;
+		}
 	}
 
 }
+
 
 int main(int argc, char** argv){
 	ros::init(argc,argv,"teleop_control");
 	ros::NodeHandle nh;
 	RobotDriver driver(nh);
 
-	double angular_speed = 0.3;
-	double linear_speed = 0.1;
-	int drawing_cycles = 1;
+	//default settings to draw a square.
+	double angular_speed = MAX_LINEAR_SPEED/2;
+	double linear_speed = MAX_LINEAR_SPEED/2;
+	int edges_number = 4;
+	double edges_length = 1;
 
 	std::cout << "Welcome to tutlebot_driver" << std::endl;
-	std::cout << "     _________     __  " << std::endl;
-	std::cout << "    /_|__|__|_\\   / -\\ " << std::endl;
-	std::cout << "   /__|__|__|__\\  \\__< " << std::endl;
-	std::cout << "o_/___|__|__|___\\_|    " << std::endl;
-	std::cout << "   ())      ())        " << std::endl;
+
+
+	std::cout << "                        _____________  " << std::endl; 
+	std::cout << "                       /             \\ " << std::endl;
+	std::cout << "                       | Let\'s roll! | "<< std::endl;
+	std::cout << "     _________     __  \\  ___________/ " << std::endl;
+	std::cout << "    /_|__|__|_\\   / -\\  \\/             " << std::endl;
+	std::cout << "   /__|__|__|__\\  \\__<                " << std::endl;
+	std::cout << "o_/___|__|__|___\\_|                    " << std::endl;
+	std::cout << "   ())      ())                         " << std::endl;
 	std::cout << "" << std::endl;
+	std::cout << "" << std::endl;
+	std::cout << "This program intends to control Gazebo\'s TurtleBot and drive it in a polygonal shaped pathway." << std::endl;
+	std::cout << "" << std::endl;
+	
 
-
-	captureTurtleSpeed(linear_speed,angular_speed);
-	driver.setSpeed(linear_speed,angular_speed);
-
-	for(int i=0; i<drawing_cycles; i++){
-		std::cout << "Square path: " << std::endl;		
-		driver.driveOnAPolygonPath(4, 1);
-	}
-
-	for(int i=0; i<drawing_cycles; i++){
-		std::cout << "Triangle path: " << std::endl;
-		driver.driveOnAPolygonPath(3, 1);
-	}
-
-	for(int i=0; i<drawing_cycles; i++){
-		std::cout << "Pentagon path: " << std::endl;
-		driver.driveOnAPolygonPath(5, 1);
-	}
+	captureTurtleSettings(linear_speed, angular_speed, edges_number, edges_length);
+	driver.setSpeed(linear_speed, angular_speed);
+	driver.driveOnAPolygonPath(edges_number, edges_length);
 
 	return 0;
 }
