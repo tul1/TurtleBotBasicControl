@@ -12,7 +12,8 @@ Version 1.0
 ## Dependencies
 
 * ROS: kinect version 
-* catkin_tools: version 0.4.4 
+* catkin_tools: version 0.4.4
+* gtest
 
 ## How to build the project
 The followings are de commands to build turtlebot_driver's project. 
@@ -20,17 +21,16 @@ The followings are de commands to build turtlebot_driver's project.
 	#Change directory to the catkin workspace	
 	$cd catkin_ws_turtleBotBasicControl
 	
-	#Building the project
+	#Build the project
 	$catkin_make
 	
-	#sourcing the project's environment 
+	#Source the project's environment 
 	$source ./devel/setup.bash
 
 
 ## How to build the project
 The followings are de commands to run turtlebot_driver's node.
 
-	#launch Gazebo's turtlebot simulator
+	#Launch Gazebo's turtlebot simulator
 	$roslaunch turtlebot_gazebo turtlebot_world.launch
-
 

@@ -124,6 +124,7 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/turtlebot_driver.cpp
 # )
+add_library(robot_driver src/robot_driver.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -133,7 +134,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/turtlebot_driver.cpp)
+add_executable(turtlebot_driver_node src/turtlebot_driver.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -144,13 +145,10 @@ add_executable(${PROJECT_NAME}_node src/turtlebot_driver.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_node 
-	${PROJECT_NAME}_node_generate_messages_cpp)
+add_dependencies(turtlebot_driver_node robot_driver turtlebot_driver_node_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(turtlebot_driver_node ${catkin_LIBRARIES} robot_driver)
 
 #############
 ## Install ##
@@ -192,10 +190,10 @@ target_link_libraries(${PROJECT_NAME}_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_turtlebot_driver.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+#catkin_add_gtest(utest test/robot_driver_test.cpp robot_driver)
+
+
 
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+#catkin_add_nosetests(test)
