@@ -7,14 +7,11 @@
 #include "nav_msgs/Odometry.h"
 #include "robot_driver.h"
 
-//#define DEBUG_MOVE_FORWARD
-//#define DEBUG_TURN_RIGHT
-
 RobotDriver::RobotDriver(ros::NodeHandle &nh){
 	nh_ = nh;
 	cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("mobile_base/commands/velocity",1);
 	odom_sub_ = nh_.subscribe("odom", 1, &RobotDriver::odomCallback, this);
-	loop_rate_ = new ros::Rate(50);
+	loop_rate_ = new ros::Rate(PUBLISH_RATE);
 }
 
 void RobotDriver::odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
@@ -45,7 +42,7 @@ int RobotDriver::moveForward(double distance) {
 	std::cout << "initial_x: " << start_position_x << "  initial_y: " << start_position_y << std::endl;
 #endif
 
-	while( nh_.ok() && calculateDistance(start_position_x, start_position_y, position_[0], position_[1]) < distance ){
+	while( nh_.ok() && calculateDistance(start_position_x, start_position_y, position_[0], position_[1]) <= distance ){
 		base_cmd.linear.x = linear_speed_;
 		cmd_vel_pub_.publish(base_cmd);
 
@@ -84,7 +81,7 @@ int RobotDriver::turnRight(double angle){
 	std::cout << "destination_angle: "<< destination_yaw_angle << "  actual_angle: " << yaw_angle_ << std::endl; 
 #endif
 
-	while(nh_.ok() && std::abs(yaw_angle_-destination_yaw_angle) > 0.5 ){
+	while(nh_.ok() && std::abs(yaw_angle_-destination_yaw_angle) > ROTATION_ANGLE_ERROR ){
 		base_cmd.angular.z = std::abs(angular_speed_);
 		cmd_vel_pub_.publish(base_cmd);
 		
@@ -118,7 +115,3 @@ void RobotDriver::setSpeed(double linear_speed, double angular_speed){
 	linear_speed_ = linear_speed;
 	angular_speed_ = angular_speed;
 }
-
-
-
-

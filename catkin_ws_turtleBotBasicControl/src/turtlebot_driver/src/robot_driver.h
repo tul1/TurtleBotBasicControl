@@ -2,6 +2,10 @@
 #define __ROBOT_DRIVER__
 
 #define MATH_PI 3.141593
+#define PUBLISH_RATE 100 //Hz
+#define ROTATION_ANGLE_ERROR 0.5//degree
+
+//DEBUG
 //#define DEBUG_MOVE_FORWARD
 //#define DEBUG_TURN_RIGHT
 
@@ -19,7 +23,6 @@ class RobotDriver {
 		double angular_speed_;
 
 	public:
-
 		RobotDriver(ros::NodeHandle &nh);
 		void odomCallback(const nav_msgs::Odometry::ConstPtr &msg);
 		double getYawAngle();

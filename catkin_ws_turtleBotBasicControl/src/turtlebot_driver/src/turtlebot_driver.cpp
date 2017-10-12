@@ -41,7 +41,7 @@ double captureFloatValue(std::string value_tag, double min_value, double max_val
 }
 
 
-int captureTurtleSettings(double &linear, double &angular,int &edges_number, double &edges_length){
+void captureTurtleSettings(double &linear, double &angular,int &edges_number, double &edges_length){
 	char cmd[50];
 	while(true){
 		linear = captureIntValue("Linear speed",0,100);
@@ -63,7 +63,7 @@ int captureTurtleSettings(double &linear, double &angular,int &edges_number, dou
 			std::cout << "Only keys Y or N are valid commands." << std::endl;
 			std::cout << "" << std::endl;
 		}
-		if(cmd[0]!='Y'){
+		if(cmd[0] == 'Y'){
 			linear = linear*LINEAR_MAX_SPEED/100;
 			angular = angular*ANGULAR_MAX_SPEED/100;		
 			std::cout << "Let's roll!" << std::endl;
@@ -105,6 +105,8 @@ int main(int argc, char** argv){
 	captureTurtleSettings(linear_speed, angular_speed, edges_number, edges_length);
 	driver.setSpeed(linear_speed, angular_speed);
 	driver.driveOnAPolygonPath(edges_number, edges_length);
+	
+	std::cout << "bye bye!" << std::endl;
 
 	return 0;
 }
