@@ -1,8 +1,0 @@
-prefix=/home/tul1/Desktop/TurtleBotBasicControl/catkin_ws_turtleBotBasicControl/devel
-
-Name: turtlebot_driver
-Description: Description of turtlebot_driver
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/tul1/Desktop/TurtleBotBasicControl/catkin_ws_turtleBotBasicControl/devel/lib 
-Requires: 
